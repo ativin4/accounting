@@ -428,6 +428,18 @@ export default function InvoiceForm({ initialData, onSuccess, onCancel }: Invoic
                   </div>
                 </div>
 
+                {/* Serial Numbers */}
+                {selectedProducts.get(item.id)?.trackSerialNumbers && (
+                  <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <SerialNumberInput
+                      productId={item.productId}
+                      quantity={item.quantity}
+                      value={item.serialNumbers || []}
+                      onChange={(serialNumbers) => updateItem(index, 'serialNumbers', serialNumbers)}
+                    />
+                  </div>
+                )}
+
                 <div className="text-right text-sm text-gray-600">
                   Subtotal: {formatCurrency(item.quantity * item.price)}
                 </div>
