@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import ProductSelector from './ProductSelector';
 import ProductModal from './ProductModal';
+import SerialNumberInput from './SerialNumberInput';
 import type { Customer, Product, InvoiceItem } from '../../types';
 
 interface InvoiceFormData {
