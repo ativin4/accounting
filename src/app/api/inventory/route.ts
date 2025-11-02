@@ -1,18 +1,45 @@
-import { NextRequest } from "next/server";
-import sql from "@/lib/db";
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(req: NextRequest) {
-  const data = await req.json();
-  const { company_id, name, hsn, wholesale_price, retail_price } = data;
-  const result = await sql`
-    INSERT INTO inventory (company_id, name, hsn, wholesale_price, retail_price)
-    VALUES (${company_id}, ${name}, ${hsn}, ${wholesale_price}, ${retail_price})
-    RETURNING *;
-  `;
-  return Response.json(result[0]);
+// Redirect inventory API calls to products API for backward compatibility
+export async function GET(request: NextRequest) {
+  const url = new URL(request.url);
+  const productsUrl = url.toString().replace('/api/inventory', '/api/products');
+
+  try {
+    const response = await fetch(productsUrl, {
+      method: 'GET',
+      headers: request.headers,
+    });
+
+    const data = await response.json();
+    return NextResponse.json(data, { status: response.status });
+  } catch (error) {
+    console.error('Error redirecting to products API:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch inventory' },
+      { status: 500 }
+    );
+  }
 }
 
-export async function GET() {
-  const result = await sql`SELECT * FROM inventory`;
-  return Response.json(result);
+export async function POST(request: NextRequest) {
+  const url = new URL(request.url);
+  const productsUrl = url.toString().replace('/api/inventory', '/api/products');
+
+  try {
+    const response = await fetch(productsUrl, {
+      method: 'POST',
+      headers: request.headers,
+      body: JSON.stringify(await request.json()),
+    });
+
+    const data = await response.json();
+    return NextResponse.json(data, { status: response.status });
+  } catch (error) {
+    console.error('Error redirecting to products API:', error);
+    return NextResponse.json(
+      { error: 'Failed to create inventory item' },
+      { status: 500 }
+    );
+  }
 }
